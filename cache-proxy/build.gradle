@@ -1,0 +1,68 @@
+def hystrixVersion='1.4.0-RC4'
+def eurekaVersion='1.1.132'
+
+subprojects{
+    group = 'com.ctriposs'
+    version = '1.0'
+
+    apply plugin: 'java'
+    sourceCompatibility = 1.7
+    repositories {
+        mavenCentral()
+        mavenLocal()
+        maven {
+            url = mavenRepoPublicUrl
+        }
+    }
+
+    apply plugin: 'maven'
+    uploadArchives {
+        repositories {
+            mavenDeployer {
+                repository(url: mavenRepoUrl) {
+                    authentication(userName: mavenRepoUser, password: mavenRepoPassword)
+                }
+            }
+        }
+    }
+
+    dependencies {
+        testCompile 'junit:junit:4.11'
+        testCompile 'org.mockito:mockito-all:1.9.5'
+    }
+}
+
+project(':cacheproxy-server'){
+    apply plugin:'application'
+    mainClassName='com.ctriposs.cacheproxy.CacheProxyMain'
+
+    dependencies {
+        compile 'com.ctriposs:tools-internals:1.0.3'
+        compile 'com.ctriposs:tools-instrumentation:1.0.6'
+
+        compile 'org.slf4j:slf4j-api:1.7.5'
+        compile 'ch.qos.logback:logback-core:1.1.1'
+        compile 'ch.qos.logback:logback-classic:1.1.1'
+        compile 'ch.qos.logback:logback-access:1.1.1'
+        compile 'com.ctrip.freeway:central-logging-agent:2.1.16'
+
+        compile 'io.netty:netty-all:5.0.0.Alpha1'
+
+        compile "com.netflix.eureka:eureka-core:$eurekaVersion"
+        compile "com.netflix.eureka:eureka-client:$eurekaVersion"
+
+        compile 'org.codehaus.groovy:groovy-all:2.0.2'
+        compile 'org.apache.httpcomponents:httpclient:4.3.3'
+
+        compile 'org.bouncycastle:bcprov-jdk15on:1.51'
+    }
+}
+
+project(':cacheproxy-scripts'){
+    apply plugin: 'groovy'
+    dependencies {
+        compile project(':cacheproxy-server')
+
+        compile 'org.codehaus.groovy:groovy-all:2.0.2'
+    }
+}
